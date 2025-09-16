@@ -1,5 +1,7 @@
 package ca.corbett.imageviewer.extensions.imagetransform;
 
+import ca.corbett.extras.gradient.ColorSelectionType;
+import ca.corbett.forms.Margins;
 import ca.corbett.imageviewer.extensions.ImageViewerExtensionManager;
 import ca.corbett.imageviewer.ui.MainWindow;
 import ca.corbett.extras.image.ImageUtil;
@@ -316,12 +318,12 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         FormPanel formPanel = new FormPanel();
 
         LabelField label = new LabelField("Transform:");
-        label.setMargins(25, 5, 0, 5, 0);
-        label.setFont(label.getFieldLabelFont().deriveFont(Font.BOLD, 16f));
-        formPanel.addFormField(label);
+        label.setMargins(new Margins(5, 25, 0, 5, 0));
+        label.setFont(LabelField.getDefaultFont().deriveFont(Font.BOLD, 16f));
+        formPanel.add(label);
 
         PanelField panelField = new PanelField();
-        panelField.setMargins(2, 0, 0, 0, 0);
+        panelField.setMargins(new Margins(0, 2, 0, 0, 0));
         JPanel p = panelField.getPanel();
         p.setLayout(new FlowLayout(FlowLayout.CENTER));
         JButton btn = new JButton("Rotate right");
@@ -334,10 +336,10 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         });
         btn.setPreferredSize(new Dimension(200, 25));
         p.add(btn);
-        formPanel.addFormField(panelField);
+        formPanel.add(panelField);
 
         panelField = new PanelField();
-        panelField.setMargins(0, 0, 0, 0, 0);
+        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
         p = panelField.getPanel();
         p.setLayout(new FlowLayout(FlowLayout.CENTER));
         btn = new JButton("Rotate left");
@@ -350,10 +352,10 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         });
         btn.setPreferredSize(new Dimension(200, 25));
         p.add(btn);
-        formPanel.addFormField(panelField);
+        formPanel.add(panelField);
 
         panelField = new PanelField();
-        panelField.setMargins(0, 0, 0, 0, 0);
+        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
         p = panelField.getPanel();
         p.setLayout(new FlowLayout(FlowLayout.CENTER));
         btn = new JButton("Mirror vertical");
@@ -366,10 +368,10 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         });
         btn.setPreferredSize(new Dimension(200, 25));
         p.add(btn);
-        formPanel.addFormField(panelField);
+        formPanel.add(panelField);
 
         panelField = new PanelField();
-        panelField.setMargins(0, 0, 0, 0, 0);
+        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
         p = panelField.getPanel();
         p.setLayout(new FlowLayout(FlowLayout.CENTER));
         btn = new JButton("Mirror horizontal");
@@ -382,19 +384,19 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         });
         btn.setPreferredSize(new Dimension(200, 25));
         p.add(btn);
-        formPanel.addFormField(panelField);
+        formPanel.add(panelField);
 
         label = new LabelField("Rectangle fill:");
-        label.setMargins(45, 5, 0, 5, 0);
-        label.setFont(label.getFieldLabelFont().deriveFont(Font.BOLD, 16f));
+        label.setMargins(new Margins(5, 45, 0, 5, 0));
+        label.setFont(LabelField.getDefaultFont().deriveFont(Font.BOLD, 16f));
         //TODO formPanel.addFormField(label);
 
-        fillColorField = new ColorField("Fill color:", Color.BLACK);
-        fillColorField.setMargins(5, 25, 0, 5, 5);
+        fillColorField = new ColorField("Fill color:", ColorSelectionType.SOLID).setColor(Color.BLACK);
+        fillColorField.setMargins(new Margins(5, 25, 0, 5, 5));
         //TODO formPanel.addFormField(fillColorField);
 
         panelField = new PanelField();
-        panelField.setMargins(0, 0, 0, 0, 0);
+        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
         p = panelField.getPanel();
         btn = new JButton("Select from image");
         btn.setPreferredSize(new Dimension(200, 25));
@@ -410,7 +412,7 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         //TODO formPanel.addFormField(panelField);
 
         panelField = new PanelField();
-        panelField.setMargins(0, 0, 0, 0, 0);
+        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
         p = panelField.getPanel();
         btn = new JButton("Fill rectangle");
         btn.setPreferredSize(new Dimension(200, 25));
@@ -418,7 +420,7 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         //TODO formPanel.addFormField(panelField);
 
         panelField = new PanelField();
-        panelField.setMargins(65, 0, 0, 0, 0);
+        panelField.setMargins(new Margins(0, 65, 0, 0, 0));
         p = panelField.getPanel();
         p.setLayout(new FlowLayout(FlowLayout.CENTER));
         btn = new JButton("Reset");
@@ -431,10 +433,10 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         });
         btn.setPreferredSize(new Dimension(200, 25));
         p.add(btn);
-        formPanel.addFormField(panelField);
+        formPanel.add(panelField);
 
         panelField = new PanelField();
-        panelField.setMargins(0, 0, 0, 0, 0);
+        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
         p = panelField.getPanel();
         p.setLayout(new FlowLayout(FlowLayout.CENTER));
         btn = new JButton("Cancel and close");
@@ -447,10 +449,10 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         });
         btn.setPreferredSize(new Dimension(200, 25));
         p.add(btn);
-        formPanel.addFormField(panelField);
+        formPanel.add(panelField);
 
         panelField = new PanelField();
-        panelField.setMargins(0, 0, 0, 0, 0);
+        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
         p = panelField.getPanel();
         p.setLayout(new FlowLayout(FlowLayout.CENTER));
         btn = new JButton("Save and close");
@@ -468,9 +470,8 @@ public class TransformImageDialog extends JDialog implements KeyEventDispatcher 
         });
         btn.setPreferredSize(new Dimension(200, 25));
         p.add(btn);
-        formPanel.addFormField(panelField);
+        formPanel.add(panelField);
 
-        formPanel.render();
         return formPanel;
     }
 
