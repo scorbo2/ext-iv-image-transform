@@ -38,6 +38,10 @@ public class TransformImageExtension extends ImageViewerExtension {
     }
 
     @Override
+    public void loadJarResources() {
+    }
+
+    @Override
     protected List<AbstractProperty> createConfigProperties() {
         return null;
     }
