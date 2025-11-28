@@ -1,9 +1,9 @@
 {
   "name": "Transform image",
   "author": "steve@corbett.ca",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "targetAppName": "ImageViewer",
-  "targetAppVersion": "2.2",
+  "targetAppVersion": "2.3",
   "shortDescription": "Apply simple transformations to an image",
   "longDescription": "Allows you to rotate or flip images.",
   "customFields": {
