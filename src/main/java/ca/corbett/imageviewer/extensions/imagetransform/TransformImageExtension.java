@@ -75,6 +75,6 @@ public class TransformImageExtension extends ImageViewerExtension {
      */
     public static boolean fileExtensionIsSupported(File f) {
         String name = f.getName().toLowerCase();
-        return name.endsWith("jpg") || name.endsWith("jpeg") || name.endsWith("png");
+        return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png");
     }
 }

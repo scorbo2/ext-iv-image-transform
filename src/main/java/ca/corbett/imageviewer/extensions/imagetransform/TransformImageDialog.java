@@ -86,6 +86,13 @@ public class TransformImageDialog extends JDialog {
     }
 
     private void confirmSaveAndDispose() {
+        // If no changes have been made, just treat it like a cancel:
+        if (!isDirty) {
+            dispose();
+            return;
+        }
+
+        // Otherwise, prompt for confirmation:
         if (getMessageUtil().askYesNo("Confirm",
                                       "Save current transform and close?\nThis will overwrite the original image.")
             == MessageUtil.YES) {
@@ -97,6 +104,7 @@ public class TransformImageDialog extends JDialog {
         if (!isDirty) {
             getMessageUtil().getLogger().info("TransformImageDialog: no changes to save; closing.");
             dispose();
+            return;
         }
 
         try {
@@ -111,7 +119,7 @@ public class TransformImageDialog extends JDialog {
                     throw new IOException("Unable to find PNG writer on this system.");
                 }
 
-                getMessageUtil().getLogger().log(Level.INFO, "TransformDialog: saving transformed jpeg image: {0}",
+                getMessageUtil().getLogger().log(Level.INFO, "TransformDialog: saving transformed png image: {0}",
                                                  srcFile.getAbsolutePath());
                 if (srcFile.exists()) {
                     srcFile.delete();
@@ -120,7 +128,7 @@ public class TransformImageDialog extends JDialog {
             }
 
             else if (isJpeg()) {
-                getMessageUtil().getLogger().log(Level.INFO, "TransformDialog: saving transformed png image: {0}",
+                getMessageUtil().getLogger().log(Level.INFO, "TransformDialog: saving transformed jpeg image: {0}",
                                                  srcFile.getAbsolutePath());
                 if (srcFile.exists()) {
                     srcFile.delete();
@@ -145,7 +153,6 @@ public class TransformImageDialog extends JDialog {
         catch (IOException ioe) {
             getMessageUtil().error("Problem transforming image: " + ioe.getMessage(), ioe);
         }
-
     }
 
     private boolean isPng() {
