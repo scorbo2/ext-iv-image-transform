@@ -40,7 +40,7 @@ cp target/ext-iv-image-transform-3.0.0.jar ~/.ImageViewer/extensions/
 
 ## Okay, it's installed, now how do I use it?
 
-Once ImageViewer is restarted, you can hit Ctrl+T or select "Transform image" from the "Edit" menu:
+Once ImageViewer is restarted, you can hit Shift+T or select "Transform image" from the "Edit" menu:
 
 ![Screenshot](screenshot.png "Screenshot")
 

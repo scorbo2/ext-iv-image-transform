@@ -1,12 +1,12 @@
 {
   "name": "Transform image",
   "author": "steve@corbett.ca",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "targetAppName": "ImageViewer",
-  "targetAppVersion": "2.3",
+  "targetAppVersion": "3.0",
   "shortDescription": "Apply simple transformations to an image",
   "longDescription": "Allows you to rotate or flip images.",
   "customFields": {
-    "Keyboard shortcut": "Ctrl+T"
+    "Keyboard shortcut": "Default: Shift+T, change in application settings."
   }
 }

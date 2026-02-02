@@ -1,27 +1,29 @@
 package ca.corbett.imageviewer.extensions.imagetransform;
 
-import ca.corbett.imageviewer.extensions.ImageViewerExtension;
 import ca.corbett.extensions.AppExtensionInfo;
+import ca.corbett.extras.EnhancedAction;
+import ca.corbett.extras.io.KeyStrokeManager;
 import ca.corbett.extras.properties.AbstractProperty;
+import ca.corbett.extras.properties.KeyStrokeProperty;
+import ca.corbett.imageviewer.AppConfig;
+import ca.corbett.imageviewer.extensions.ImageViewerExtension;
 import ca.corbett.imageviewer.ui.MainWindow;
+import ca.corbett.imageviewer.ui.ReservedKeyStrokeWorkaround;
 
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wraps the old Transform dialog into its own extension.
- * TransformDialog was originally written for ImageViewer 1.3, but now in the
- * 2.x version, we can move some of this functionality out into extensions so
- * it can be disabled to remove it from the UI entirely if unneeded.
+ * An ImageViewer extension that adds very basic image transformation capabilities.
+ * The selected image can be rotated or flipped, and then saved in place.
  *
- * @author scorbo2
+ * @author <a href="https://github.com/scorbo2">scorbo2</a>
+ * @since ImageViewer 1.3 originally, moved to extension in ImageViewer 2.0
  */
 public class TransformImageExtension extends ImageViewerExtension {
 
+    private static final String keystrokeProp = AppConfig.KEYSTROKE_PREFIX + "Image Transform.keystroke";
     private final AppExtensionInfo extInfo;
 
     public TransformImageExtension() {
@@ -43,36 +45,36 @@ public class TransformImageExtension extends ImageViewerExtension {
 
     @Override
     protected List<AbstractProperty> createConfigProperties() {
-        return null;
+        List<AbstractProperty> props = new ArrayList<>();
+
+        props.add(new KeyStrokeProperty(keystrokeProp,
+                                        "Transform image:",
+                                        KeyStrokeManager.parseKeyStroke("Shift+T"),
+                                        TransformImageAction.getInstance())
+                      .setAllowBlank(true)
+                      .addFormFieldGenerationListener(new ReservedKeyStrokeWorkaround()));
+
+        return props;
     }
 
     @Override
-    public List<JMenuItem> getMenuItems(String topLevelMenu, MainWindow.BrowseMode browseMode) {
-        if (browseMode == MainWindow.BrowseMode.IMAGE_SET) {
-            return null; // we COULD allow transformations when browsing image sets...
-        }
+    public List<EnhancedAction> getMenuActions(String topLevelMenu, MainWindow.BrowseMode browseMode) {
         if ("Edit".equals(topLevelMenu)) {
-            List<JMenuItem> list = new ArrayList<>();
-            list.add(buildMenuItem());
-            return list;
+            return List.of(TransformImageAction.getInstance());
         }
         return null;
     }
 
     @Override
-    public List<JMenuItem> getPopupMenuItems(MainWindow.BrowseMode browseMode) {
-        if (browseMode == MainWindow.BrowseMode.IMAGE_SET) {
-            return null; // we COULD allow transformations when browsing image sets...
-        }
-        List<JMenuItem> list = new ArrayList<>();
-        list.add(buildMenuItem());
-        return list;
+    public List<EnhancedAction> getPopupMenuActions(MainWindow.BrowseMode browseMode) {
+        return List.of(TransformImageAction.getInstance());
     }
 
-    private JMenuItem buildMenuItem() {
-        JMenuItem item = new JMenuItem(new TransformImageAction());
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
-        return item;
+    /**
+     * Provides a case-insensitive check to see if the given file has a supported image extension.
+     */
+    public static boolean fileExtensionIsSupported(File f) {
+        String name = f.getName().toLowerCase();
+        return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png");
     }
-
 }
