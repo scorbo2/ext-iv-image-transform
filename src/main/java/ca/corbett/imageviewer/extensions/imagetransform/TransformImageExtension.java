@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class TransformImageExtension extends ImageViewerExtension {
 
-    private static final String keystrokeProp = AppConfig.KEYSTROKE_PREFIX + "Image Transform.keystroke";
+    private static final String keystrokeProp = AppConfig.KEYSTROKE_MISC_PREFIX + "imageTransform";
     private final AppExtensionInfo extInfo;
 
     public TransformImageExtension() {
@@ -52,6 +52,7 @@ public class TransformImageExtension extends ImageViewerExtension {
                                         KeyStrokeManager.parseKeyStroke("Shift+T"),
                                         TransformImageAction.getInstance())
                       .setAllowBlank(true)
+                      .setHelpText("Show the image transform dialog")
                       .addFormFieldGenerationListener(new ReservedKeyStrokeWorkaround()));
 
         return props;
