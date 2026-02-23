@@ -8,7 +8,6 @@ import ca.corbett.extras.properties.KeyStrokeProperty;
 import ca.corbett.imageviewer.AppConfig;
 import ca.corbett.imageviewer.extensions.ImageViewerExtension;
 import ca.corbett.imageviewer.ui.MainWindow;
-import ca.corbett.imageviewer.ui.ReservedKeyStrokeWorkaround;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,8 +51,8 @@ public class TransformImageExtension extends ImageViewerExtension {
                                         KeyStrokeManager.parseKeyStroke("Shift+T"),
                                         TransformImageAction.getInstance())
                       .setAllowBlank(true)
-                      .setHelpText("Show the image transform dialog")
-                      .addFormFieldGenerationListener(new ReservedKeyStrokeWorkaround()));
+                      .setReservedKeyStrokes(AppConfig.RESERVED_KEYSTROKES)
+                      .setHelpText("Show the image transform dialog"));
 
         return props;
     }
