@@ -6,32 +6,28 @@ import ca.corbett.extras.image.ImagePanelConfig;
 import ca.corbett.extras.image.ImageUtil;
 import ca.corbett.extras.io.KeyStrokeManager;
 import ca.corbett.forms.FormPanel;
-import ca.corbett.forms.Margins;
 import ca.corbett.forms.fields.LabelField;
 import ca.corbett.forms.fields.PanelField;
 import ca.corbett.imageviewer.extensions.ImageViewerExtensionManager;
 import ca.corbett.imageviewer.ui.MainWindow;
 import ca.corbett.imageviewer.ui.ThumbCacheManager;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-import java.awt.event.ActionEvent;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -109,22 +105,12 @@ public class TransformImageDialog extends JDialog {
 
         try {
             if (isPng()) {
-                // This really feels like it belongs in ImageUtil...
-                Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("png");
-                ImageWriter imageWriter = null;
-                if (iter.hasNext()) {
-                    imageWriter = iter.next();
-                }
-                if (imageWriter == null) {
-                    throw new IOException("Unable to find PNG writer on this system.");
-                }
-
                 getMessageUtil().getLogger().log(Level.INFO, "TransformDialog: saving transformed png image: {0}",
                                                  srcFile.getAbsolutePath());
                 if (srcFile.exists()) {
                     srcFile.delete();
                 }
-                ImageUtil.saveImage(dBuffer, srcFile, imageWriter, null);
+                ImageUtil.savePngImage(dBuffer, srcFile);
             }
 
             else if (isJpeg()) {
@@ -165,7 +151,10 @@ public class TransformImageDialog extends JDialog {
     }
 
     private void flipHorizontal() {
-        BufferedImage newImage = new BufferedImage(dBuffer.getWidth(), dBuffer.getHeight(), BufferedImage.TYPE_INT_RGB);
+        int imageType = originalImage.getColorModel().hasAlpha()
+            ? BufferedImage.TYPE_INT_ARGB
+            : BufferedImage.TYPE_INT_RGB;
+        BufferedImage newImage = new BufferedImage(dBuffer.getWidth(), dBuffer.getHeight(), imageType);
         Graphics2D g = newImage.createGraphics();
         g.drawImage(dBuffer, dBuffer.getWidth(), 0, -dBuffer.getWidth(), dBuffer.getHeight(), null);
         g.dispose();
@@ -176,7 +165,10 @@ public class TransformImageDialog extends JDialog {
     }
 
     private void flipVertical() {
-        BufferedImage newImage = new BufferedImage(dBuffer.getWidth(), dBuffer.getHeight(), BufferedImage.TYPE_INT_RGB);
+        int imageType = originalImage.getColorModel().hasAlpha()
+            ? BufferedImage.TYPE_INT_ARGB
+            : BufferedImage.TYPE_INT_RGB;
+        BufferedImage newImage = new BufferedImage(dBuffer.getWidth(), dBuffer.getHeight(), imageType);
         Graphics2D g = newImage.createGraphics();
         g.drawImage(dBuffer, 0, dBuffer.getHeight(), dBuffer.getWidth(), -dBuffer.getHeight(), null);
         g.dispose();
@@ -196,7 +188,10 @@ public class TransformImageDialog extends JDialog {
         if (dBuffer != null) {
             dBuffer.flush();
         }
-        dBuffer = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+        int imageType = originalImage.getColorModel().hasAlpha()
+            ? BufferedImage.TYPE_INT_ARGB
+            : BufferedImage.TYPE_INT_RGB;
+        dBuffer = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), imageType);
         Graphics2D g = dBuffer.createGraphics();
         g.drawImage(originalImage, 0, 0, null);
         g.dispose();
@@ -212,8 +207,11 @@ public class TransformImageDialog extends JDialog {
     }
 
     private void rotateRight() {
+        int imageType = originalImage.getColorModel().hasAlpha()
+            ? BufferedImage.TYPE_INT_ARGB
+            : BufferedImage.TYPE_INT_RGB;
         BufferedImage newImage = new BufferedImage(dBuffer.getHeight(), dBuffer.getWidth(),
-                                                   BufferedImage.TYPE_INT_RGB); // note swapping width/height
+                                                   imageType); // note swapping width/height
         Graphics2D g = newImage.createGraphics();
         AffineTransform transform = new AffineTransform(0.0, 1.0, -1.0, 0.0, dBuffer.getHeight(), 0.0);
         g.transform(transform);
@@ -243,76 +241,43 @@ public class TransformImageDialog extends JDialog {
 
     private FormPanel buildControlPanel() {
         FormPanel formPanel = new FormPanel();
+        formPanel.setBorderMargin(10);
+        formPanel.add(LabelField.createBoldHeaderLabel("Transform:", 16));
 
-        LabelField label = new LabelField("Transform:");
-        label.setMargins(new Margins(5, 25, 0, 5, 0));
-        label.setFont(LabelField.getDefaultFont().deriveFont(Font.BOLD, 16f));
-        formPanel.add(label);
+        PanelField panelField = new PanelField(new GridBagLayout());
+        panelField.setShouldExpand(true);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(4, 0, 4, 0);
+        JPanel panel = panelField.getPanel();
+        panel.add(createButton("Rotate right", e -> rotateRight()), gbc);
+        gbc.gridy++;
+        panel.add(createButton("Rotate left", e -> rotateLeft()), gbc);
+        gbc.gridy++;
+        panel.add(createButton("Mirror vertical", e -> flipVertical()), gbc);
+        gbc.gridy++;
+        panel.add(createButton("Mirror horizontal", e -> flipHorizontal()), gbc);
+        gbc.gridy++;
 
-        PanelField panelField = new PanelField(new FlowLayout(FlowLayout.CENTER));
-        panelField.setMargins(new Margins(0, 2, 0, 0, 0));
-        JPanel p = panelField.getPanel();
-        JButton btn = new JButton("Rotate right");
-        btn.addActionListener(e -> rotateRight());
-        btn.setPreferredSize(new Dimension(200, 25));
-        p.add(btn);
-        formPanel.add(panelField);
-
-        panelField = new PanelField(new FlowLayout(FlowLayout.CENTER));
-        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
-        p = panelField.getPanel();
-        btn = new JButton("Rotate left");
-        btn.addActionListener(e -> rotateLeft());
-        btn.setPreferredSize(new Dimension(200, 25));
-        p.add(btn);
-        formPanel.add(panelField);
-
-        panelField = new PanelField(new FlowLayout(FlowLayout.CENTER));
-        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
-        p = panelField.getPanel();
-        btn = new JButton("Mirror vertical");
-        btn.addActionListener(e -> flipVertical());
-        btn.setPreferredSize(new Dimension(200, 25));
-        p.add(btn);
-        formPanel.add(panelField);
-
-        panelField = new PanelField(new FlowLayout(FlowLayout.CENTER));
-        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
-        p = panelField.getPanel();
-        btn = new JButton("Mirror horizontal");
-        btn.addActionListener(e -> flipHorizontal());
-        btn.setPreferredSize(new Dimension(200, 25));
-        p.add(btn);
-        formPanel.add(panelField);
-
-        panelField = new PanelField(new FlowLayout(FlowLayout.CENTER));
-        panelField.setMargins(new Margins(0, 65, 0, 0, 0));
-        p = panelField.getPanel();
-        btn = new JButton("Reset");
-        btn.addActionListener(e -> resetTransform());
-        btn.setPreferredSize(new Dimension(200, 25));
-        p.add(btn);
-        formPanel.add(panelField);
-
-        panelField = new PanelField(new FlowLayout(FlowLayout.CENTER));
-        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
-        p = panelField.getPanel();
-        btn = new JButton("Cancel and close");
-        btn.addActionListener(e -> dispose());
-        btn.setPreferredSize(new Dimension(200, 25));
-        p.add(btn);
-        formPanel.add(panelField);
-
-        panelField = new PanelField(new FlowLayout(FlowLayout.CENTER));
-        panelField.setMargins(new Margins(0, 0, 0, 0, 0));
-        p = panelField.getPanel();
-        btn = new JButton("Save and close");
-        btn.addActionListener(e -> saveTransform());
-        btn.setPreferredSize(new Dimension(200, 25));
-        p.add(btn);
+        gbc.insets = new Insets(30, 0, 4, 0);
+        panel.add(createButton("Reset transform", e -> resetTransform()), gbc);
+        gbc.gridy++;
+        gbc.insets = new Insets(4, 0, 4, 0);
+        panel.add(createButton("Cancel and close", e -> dispose()), gbc);
+        gbc.gridy++;
+        panel.add(createButton("Save and close", e -> saveTransform()), gbc);
         formPanel.add(panelField);
 
         return formPanel;
+    }
+
+    private JButton createButton(String text, ActionListener listener) {
+        JButton btn = new JButton(text);
+        btn.setPreferredSize(new Dimension(180, 24));
+        btn.setMinimumSize(new Dimension(180, 24));
+        btn.addActionListener(listener);
+        return btn;
     }
 
     private ImagePanel buildImagePanel() {
@@ -325,24 +290,9 @@ public class TransformImageDialog extends JDialog {
      * Hit enter to save and close, escape to cancel and close, or ctrl+z to reset transform (undo all).
      */
     private void configureKeyStrokes() {
-        keyStrokeManager.registerHandler("ESCAPE", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-        keyStrokeManager.registerHandler("ENTER", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                confirmSaveAndDispose();
-            }
-        });
-        keyStrokeManager.registerHandler("Ctrl+Z", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                resetTransform();
-            }
-        });
+        keyStrokeManager.registerHandler("ESC", e -> dispose());
+        keyStrokeManager.registerHandler("ENTER", e -> confirmSaveAndDispose());
+        keyStrokeManager.registerHandler("Ctrl+Z", e -> resetTransform());
     }
 
     private MessageUtil getMessageUtil() {
